@@ -13,6 +13,8 @@ using namespace std;
 
 class BWImage {
   private:
+    // we will be using unsigned int all the time because the parameters of the CImg class use it,
+    // and also because the coordinates and pixel intensity of a picture are positive numbers.
     CImg<unsigned char> image;
     unsigned int hght;
     unsigned int wdth;
