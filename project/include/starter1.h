@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "CImg.h"
-
+#include <vector>
 
 #ifndef STARTER
 #define STARTER
@@ -32,6 +32,9 @@ class BWImage {
     void display_f();
     unsigned int height();
     unsigned int width();
+    void isotropic(unsigned int x, unsigned int y);
+    void isotropic2(unsigned int x, unsigned int y);
+
 };
 
 #endif

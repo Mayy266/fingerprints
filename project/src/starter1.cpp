@@ -126,20 +126,63 @@ void BWImage::display_f(){
 }
 
 
+float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
+{
+	int x = x1 - x2; //calculating number to square in next step
+	int y = y1 - y2;
+	float dist;
+
+	dist = pow(x, 2) + pow(y, 2);       //calculating Euclidean distance
+	dist = sqrt(dist);
+
+	return dist;
+}
+
+void BWImage::isotropic(unsigned int x, unsigned int y){
+  vector<vector<float>> values(wdth, vector<float>(hght));
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      values[i][j] = 255 - image(i,j,0,0)*exp(- dist(x, y, i, j));//filling the matrix of new values
+      std::cout << values[i][j] << '\n';
+      image(i,j,0,0) = values[i][j];//changing the image
+
+    }
+  }
+  cout << "coefficient values :" << endl;
+  image.save("bin/output_isotropic.png");
+  (*this).display();
+}
+
+void BWImage::isotropic2(unsigned int x, unsigned int y){
+  vector<vector<float>> values(wdth, vector<float>(hght));
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      if (image(i,j,0,0) != 255){
+        values[i][j] =  255 - image(i,j,0,0)*(1/(1+(dist(x, y, i, j)/40)));//filling the matrix of new values
+        image(i,j,0,0) = values[i][j];//changing the image
+      }
+    }
+  }
+  cout << "coefficient values :" << endl;
+  image.save("bin/output_isotropic2.png");
+  (*this).display();
+}
 
 int main() {
-  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
+//  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
+  CImg<unsigned char> image("clean_finger_small.png");
   BWImage img = BWImage(image); //creates an instance of class BWImage
 
   //img.drawRect(30, 40, 50, 30, 255);
   //img.drawRect(10, 10, 50, 60, 0);
   //img.symmetry_X();
   //img.symmetry_X();
-  img.symmetry_diagonal();
+  //img.symmetry_diagonal();
 
-  img.display();
+//  img.display();
   cout << "Min : " << img.minIntensity() << endl;
   cout << "Max : " << img.maxIntensity() << endl;
-
+  cout <<  (int)image(0,0,0,1);
+  img.isotropic2((int)(img.height()/2),(int)(img.width()/2));
   return 0;
 }
