@@ -12,6 +12,7 @@ float BWImage::toFloat(unsigned int x, unsigned int y){
   return (float)(image(x,y,0,0)/255.0);
 }
 
+
 //returns the maximum value of the intensity of the pixels
 unsigned int BWImage::maxIntensity(){
   unsigned int max = 0;
@@ -139,28 +140,30 @@ float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 }
 
 void BWImage::isotropic(unsigned int x, unsigned int y){
-  vector<vector<float>> values(wdth, vector<float>(hght));
+  vector<vector<float> > values(wdth, vector<float>(hght));
   for (unsigned int i = 0; i < wdth; ++i){
     for (unsigned int j = 0; j < hght; j++){
-      values[i][j] = 255 - image(i,j,0,0)*exp(- dist(x, y, i, j));//filling the matrix of new values
-      std::cout << values[i][j] << '\n';
-      image(i,j,0,0) = values[i][j];//changing the image
-
+      if (image(i,j,0,0) != 255){
+        values[i][j] = (255 - image(i,j,0,0))*(pow(exp(- pow((dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2))),2)),10));//distance is normaliwed between 0 and 1 and function g is computed
+        image(i,j,0,0) = 255 - values[i][j];//changing the image
+     }
     }
   }
+
+
   cout << "coefficient values :" << endl;
   image.save("bin/output_isotropic.png");
   (*this).display();
 }
 
 void BWImage::isotropic2(unsigned int x, unsigned int y){
-  vector<vector<float>> values(wdth, vector<float>(hght));
+  vector<vector<float> > values(wdth, vector<float>(hght));
   for (unsigned int i = 0; i < wdth; ++i){
     for (unsigned int j = 0; j < hght; j++){
-      if (image(i,j,0,0) != 255){
+    //  if (image(i,j,0,0) != 255){
         values[i][j] =  255 - image(i,j,0,0)*(1/(1+(dist(x, y, i, j)/40)));//filling the matrix of new values
         image(i,j,0,0) = values[i][j];//changing the image
-      }
+  //    }
     }
   }
   cout << "coefficient values :" << endl;
@@ -170,7 +173,8 @@ void BWImage::isotropic2(unsigned int x, unsigned int y){
 
 int main() {
 //  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
-  CImg<unsigned char> image("clean_finger_small.png");
+  //CImg<unsigned char> image("clean_finger_small.png");
+  CImg<unsigned char> image("warp2_finger.png");
   BWImage img = BWImage(image); //creates an instance of class BWImage
 
   //img.drawRect(30, 40, 50, 30, 255);
@@ -183,6 +187,8 @@ int main() {
   cout << "Min : " << img.minIntensity() << endl;
   cout << "Max : " << img.maxIntensity() << endl;
   cout <<  (int)image(0,0,0,1);
-  img.isotropic2((int)(img.height()/2),(int)(img.width()/2));
+  img.drawRect((int)(img.height()/2), (int)(img.width()/2), 7, 7, 255); //center of pressure
+  img.isotropic((int)(img.height()/2),(int)(img.width()/2));
+
   return 0;
 }
