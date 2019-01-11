@@ -32,8 +32,9 @@ class BWImage {
     void display_f();
     unsigned int height();
     unsigned int width();
-    void isotropic(unsigned int x, unsigned int y);
+    void isotropic1(unsigned int x, unsigned int y);
     void isotropic2(unsigned int x, unsigned int y);
+    void isotropic3(unsigned int x, unsigned int y);
 
 };
 
