@@ -139,6 +139,7 @@ float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 	return dist;
 }
 
+
 void BWImage::isotropic1(unsigned int x, unsigned int y){
   vector<vector<float> > values(wdth, vector<float>(hght));
   for (unsigned int i = 0; i < wdth; ++i){
@@ -200,10 +201,62 @@ int main() {
   //img.symmetry_X();
   //img.symmetry_diagonal();
 
+
+
+void BWImage::isotropic1(unsigned int x, unsigned int y){
+  vector<vector<float> > values(wdth, vector<float>(hght));
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      values[i][j] = (255 - image(i,j,0,0))*(pow(exp(- pow((dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2))),2)),10));//distance is normaliwed between 0 and 1 and function g is computed
+      image(i,j,0,0) = 255 - values[i][j];//changing the image
+    }
+  }
+  image.save("bin/output_isotropic1.png");
+  (*this).display();
+}
+
+void BWImage::isotropic2(unsigned int x, unsigned int y){
+  vector<vector<float> > values(wdth, vector<float>(hght));
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      values[i][j] =  (255 - image(i,j,0,0))*(1/pow((1+(dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2)))),23));
+      image(i,j,0,0) = 255 - values[i][j];//changing the image
+    }
+  }
+  image.save("bin/output_isotropic2.png");
+  (*this).display();
+}
+
+void BWImage::isotropic3(unsigned int x, unsigned int y){
+  vector<vector<float> > values(wdth, vector<float>(hght));
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      values[i][j] =  (255 - image(i,j,0,0))*(1/(1+pow((dist(x, y, i, j)/40), 2)));//filling the matrix of new values
+      image(i,j,0,0) = 255 - values[i][j];//changing the image
+    }
+  }
+  image.save("bin/output_isotropic3.png");
+  (*this).display();
+}
+
+int main() {
+//  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
+  //CImg<unsigned char> image("clean_finger_small.png");
+  CImg<unsigned char> image("clean_finger.png");
+  BWImage img = BWImage(image); //creates an instance of class BWImage
+
+  //img.drawRect(30, 40, 50, 30, 255);
+  //img.drawRect(10, 10, 50, 60, 0);
+  //img.symmetry_X();
+  //img.symmetry_X();
+  //img.symmetry_diagonal();
+
 //  img.display();
   //cout << "Min : " << img.minIntensity() << endl;
   //cout << "Max : " << img.maxIntensity() << endl;
   img.drawRect((int)(img.height()/2), (int)(img.width()/2), 7, 7, 255); //center of pressure
   img.anisotropic1((int)(img.height()/2),(int)(img.width()/2));
+
+  img.isotropic2((int)(img.height()/2),(int)(img.width()/2));
   return 0;
 }
