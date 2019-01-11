@@ -1,8 +1,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <math.h>
 #include "CImg.h"
-#include <vector>
+#include "coord.h"
+
 
 #ifndef STARTER
 #define STARTER
@@ -27,15 +29,14 @@ class BWImage {
     void symmetry_X();
     void symmetry_Y();
     void symmetry_diagonal();
+    void translation(int a, int b);
+    void rotation(float theta, unsigned int x0, unsigned int y0);
+    void rotation_and_fill(float theta, unsigned int x0, unsigned int y0);
     void display();
     void display_i();
     void display_f();
     unsigned int height();
     unsigned int width();
-    void isotropic1(unsigned int x, unsigned int y);
-    void isotropic2(unsigned int x, unsigned int y);
-    void isotropic3(unsigned int x, unsigned int y);
-
 };
 
 #endif
