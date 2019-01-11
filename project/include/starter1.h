@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <vector>
 #include "CImg.h"
 #include "coord.h"
 
