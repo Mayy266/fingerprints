@@ -93,10 +93,132 @@ void BWImage::symmetry_diagonal(){
       image(y-(hght-wdth),x+(hght-wdth),0,0) = tmp; //we crop the image so its width and height are the same, then we perform the symmetry
     }
   }
-
   drawRect(0, 0, hght-wdth, wdth, 255); //it sets the top part of the image to white
-  image.save("bin/output_symmetry_diag.png"); //saves the new image
+  image.save("bin/outputs/output_symmetry_diag.png"); //saves the new image
 }
+
+void BWImage::translation(int a, int b){
+    //initializes a temporary matrix, used to do the rotation
+    unsigned int** tmpPict = new unsigned int*[wdth];
+
+    for (unsigned int i = 0; i < wdth; i++){
+      tmpPict[i] = new unsigned int[hght];
+      for (unsigned int j = 0; j < hght; j++){
+        tmpPict[i][j] = 255;
+      }
+    }
+
+    unsigned int h = (hght%2 == 1 ? hght - 1 : hght); //checks wether the height of the image is even or odd
+    unsigned int w = (wdth%2 == 1 ? wdth - 1 : wdth); //checks wether the width of the image is even or odd
+    for (unsigned int y = 0; y < h; y++){
+      for (unsigned int x = 0; x < w; x++){
+        Coord c = Coord(x,y);
+        c.translation(a, b);
+        //if(c.getX()>=0 && c.getY()>=0 && c.getX()<wdth && c.getY()<hght){
+        if(c.getX()<wdth && c.getY()<hght){
+          tmpPict[c.getX()][c.getY()] = image(x,y,0,0);
+        }
+      }
+    }
+
+    for (unsigned int i = 0; i < wdth; i++){
+      for (unsigned int j = 0; j < hght; j++){
+        image(i,j,0,0) = tmpPict[i][j];
+      }
+    }
+
+    for (unsigned int i = 0; i < wdth; i++){
+      delete[] tmpPict[i];
+    }
+    delete[] tmpPict;
+
+    image.save("bin/outputs/output_translation.png"); //saves the new image
+}
+
+void BWImage::rotation(float theta, unsigned int x0, unsigned int y0){
+
+  //initializes a temporary matrix, used to do the rotation
+  unsigned int** tmpPict = new unsigned int*[wdth];
+
+  for (unsigned int i = 0; i < wdth; i++){
+    tmpPict[i] = new unsigned int[hght];
+    for (unsigned int j = 0; j < hght; j++){
+      tmpPict[i][j] = 0;
+    }
+  }
+  unsigned int h = (hght%2 == 1 ? hght - 1 : hght); //checks wether the height of the image is even or odd
+  unsigned int w = (wdth%2 == 1 ? wdth - 1 : wdth); //checks wether the width of the image is even or odd
+  for (unsigned int y = 0; y < h; y++){
+    for (unsigned int x = 0; x < w; x++){
+      Coord c = Coord(x,y);
+      c.rotation(theta, x0, y0);
+      if(c.getX()<wdth && c.getY()<hght){
+        tmpPict[c.getX()][c.getY()] = image(x,y,0,0);
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      image(i,j,0,0) = tmpPict[i][j];
+    }
+  }
+
+  for (unsigned int i = 0; i < wdth; i++){
+    delete[] tmpPict[i];
+  }
+  delete[] tmpPict;
+
+  image.save("bin/outputs/output_rotation.png"); //saves the new image
+}
+
+
+void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
+
+  //initializes a temporary matrix, used to do the rotation
+  unsigned int** tmpPict = new unsigned int*[wdth]; //we create a temporary matrix
+
+  for (unsigned int i = 0; i < wdth; i++){
+    tmpPict[i] = new unsigned int[hght];
+    for (unsigned int j = 0; j < hght; j++){
+      tmpPict[i][j] = 300; // we fill it with a number >255 so that we know which pixels will not take an intensity value during the rotation
+    }
+  }
+  unsigned int h = (hght%2 == 1 ? hght - 1 : hght); //checks wether the height of the image is even or odd
+  unsigned int w = (wdth%2 == 1 ? wdth - 1 : wdth); //checks wether the width of the image is even or odd
+  for (unsigned int y = 0; y < h; y++){
+    for (unsigned int x = 0; x < w; x++){
+      Coord c = Coord(x,y);
+      c.rotation(theta, x0, y0);
+      if(c.getX()<wdth && c.getY()<hght){
+        tmpPict[c.getX()][c.getY()] = image(x,y,0,0); //we fill the temporary matrix with the rotated image
+      }
+    }
+  }
+
+
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      unsigned int k = 1;
+      while(tmpPict[i][j]==300 && j+k<hght && k<4){ //whenever we have more than 4 "300" values in a row (it means we are in the corners) we fill everything with white
+        tmpPict[i][j]=tmpPict[i][j+k]; // fill each "300" value with the next non-300 value (Y-axis).
+        k++;
+      }
+      image(i,j,0,0) = tmpPict[i][j]; //we copy the values of the matrix into the original image
+      if(tmpPict[i][j]==300){
+        image(i,j,0,0) = 255; // fill the corners with white
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < wdth; i++){ //we delete the temporary matrix
+    delete[] tmpPict[i];
+  }
+  delete[] tmpPict;
+
+  image.save("bin/output_rotation_fill.png"); //saves the new image
+}
+
 
 //displays the image
 void BWImage::display(){
