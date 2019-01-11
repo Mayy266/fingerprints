@@ -2,6 +2,7 @@
 SRC=src
 INC=include
 BIN=bin
+DOCS=docs
 
 HDRS=$(wildcard ${INC}/*.h)
 SRCS=$(wildcard ${SRC}/*.cpp)

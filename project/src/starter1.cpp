@@ -171,7 +171,7 @@ void BWImage::isotropic3(unsigned int x, unsigned int y){
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("bin/output_isotropic5.png");
+  image.save("bin/output_isotropic3.png");
   (*this).display();
 }
 
@@ -191,6 +191,6 @@ int main() {
   //cout << "Min : " << img.minIntensity() << endl;
   //cout << "Max : " << img.maxIntensity() << endl;
   img.drawRect((int)(img.height()/2), (int)(img.width()/2), 7, 7, 255); //center of pressure
-  img.isotropic1((int)(img.height()/2),(int)(img.width()/2));
+  img.isotropic2((int)(img.height()/2),(int)(img.width()/2));
   return 0;
 }
