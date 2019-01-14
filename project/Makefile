@@ -9,7 +9,7 @@ SRCS=$(wildcard ${SRC}/*.cpp)
 OBJS=$(patsubst ${SRC}/%.cpp, ${BIN}/%.o, ${SRCS})
 TARGET_BINARY=${BIN}/starter1
 
-CXX ?= g++
+CXX ?= clang++
 CXXFLAGS += -I${INC} -g -std=c++14 -pedantic-errors -Wall -Wextra
 CXXFLAGS += -Wsign-conversion -Wno-unused -Wno-delete-non-virtual-dtor
 all: ${TARGET_BINARY}

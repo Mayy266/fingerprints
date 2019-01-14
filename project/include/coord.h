@@ -20,6 +20,7 @@ class Coord {
     void display();
     void translation(int a, int b);
     void rotation(float theta, unsigned int x0, unsigned int y0);
+    void inverse_rotation(float theta, unsigned int x0, unsigned int y0);
 };
 
 #endif
