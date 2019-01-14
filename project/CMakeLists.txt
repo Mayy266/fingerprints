@@ -15,23 +15,16 @@ find_package( CImg REQUIRED )
 list( APPEND PROJ_INCLUDE_DIRS
     ${CImg_INCLUDE_DIRS}
 )
-list( APPEND
-    PROJ_LIBRARY_DIRS
-    ${CImg_SYSTEM_LIBS_DIR}
-)
 
 # Add CIMG Flags to Compilation Flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS}")
 
-link_directories(${CImg_SYSTEM_LIBS_DIR})
 include_directories(${CImg_INCLUDE_DIRS})
-
-MESSAGE(STATUS ${SOURCES})
+include_directories(${PROJECT_SOURCE_DIR}/include)
+MESSAGE(STATUS ${PROJ_LIBRARY_DIRS})
 
 add_executable(fingerprints
 	${SOURCES}
 )
-
-target_link_libraries(${PROJ_NAME}
-	${CImg_SYSTEM_LIBS}
-)
+MESSAGE(STATUS ${CIMG_LIBRARIES})
+target_link_libraries(fingerprints ${CImg_LIBRARIES})
