@@ -249,8 +249,7 @@ void BWImage::display_f(){
 }
 
 
-float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
-{
+float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
 	int x = x1 - x2; //calculating number to square in next step
 	int y = y1 - y2;
 	float dist;
@@ -264,6 +263,7 @@ float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 
 void BWImage::isotropic1(unsigned int x, unsigned int y){
   vector<vector<float> > values(wdth, vector<float>(hght));
+  (*this).drawRect(x,y, 5, 5, 255); //white centered renctangle of pressure
   for (unsigned int i = 0; i < wdth; ++i){
     for (unsigned int j = 0; j < hght; j++){
       values[i][j] = (255 - image(i,j,0,0))*(pow(exp(- pow((dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2))),2)),10));//distance is normaliwed between 0 and 1 and function g is computed
@@ -276,6 +276,7 @@ void BWImage::isotropic1(unsigned int x, unsigned int y){
 
 void BWImage::isotropic2(unsigned int x, unsigned int y){
   vector<vector<float> > values(wdth, vector<float>(hght));
+  (*this).drawRect(x,y, 5, 5, 255);//white centered renctangle of pressure
   for (unsigned int i = 0; i < wdth; ++i){
     for (unsigned int j = 0; j < hght; j++){
       values[i][j] =  (255 - image(i,j,0,0))*(1/pow((1+(dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2)))),23));
@@ -288,69 +289,7 @@ void BWImage::isotropic2(unsigned int x, unsigned int y){
 
 void BWImage::isotropic3(unsigned int x, unsigned int y){
   vector<vector<float> > values(wdth, vector<float>(hght));
-  for (unsigned int i = 0; i < wdth; ++i){
-    for (unsigned int j = 0; j < hght; j++){
-      values[i][j] =  (255 - image(i,j,0,0))*(1/(1+pow((dist(x, y, i, j)/40), 2)));//filling the matrix of new values
-      image(i,j,0,0) = 255 - values[i][j];//changing the image
-    }
-  }
-  image.save("bin/output_isotropic5.png");
-  (*this).display();
-}
-
-void BWImage::anisotropic1(unsigned int x, unsigned int y){
-  vector<vector<float> > values(wdth, vector<float>(hght));
-  for (unsigned int i = 0; i < wdth; ++i){
-    for (unsigned int j = 0; j < hght; j++){
-      //values[i][j] =  (255 - image(i,j,0,0))*(1/(1+pow(sqrt(pow(i,2)/4 + pow(j,2))/40, 2)));//filling the matrix of new values
-      values[i][j] =  (255 - image(i,j,0,0))*(1/pow((1+(sqrt(pow(i,2)/4 + pow(j,2))/sqrt(pow(wdth,2) + pow(hght,2)))),4));
-      image(i,j,0,0) = 255 - values[i][j];//changing the image
-    }
-  }
-  image.save("bin/output_isotropic5.png");
-  (*this).display();
-}
-
-int main() {
-//  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
-  //CImg<unsigned char> image("clean_finger_small.png");
-  CImg<unsigned char> image("clean_finger.png");
-  BWImage img = BWImage(image); //creates an instance of class BWImage
-
-  //img.drawRect(30, 40, 50, 30, 255);
-  //img.drawRect(10, 10, 50, 60, 0);
-  //img.symmetry_X();
-  //img.symmetry_X();
-  //img.symmetry_diagonal();
-
-
-
-void BWImage::isotropic1(unsigned int x, unsigned int y){
-  vector<vector<float> > values(wdth, vector<float>(hght));
-  for (unsigned int i = 0; i < wdth; ++i){
-    for (unsigned int j = 0; j < hght; j++){
-      values[i][j] = (255 - image(i,j,0,0))*(pow(exp(- pow((dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2))),2)),10));//distance is normaliwed between 0 and 1 and function g is computed
-      image(i,j,0,0) = 255 - values[i][j];//changing the image
-    }
-  }
-  image.save("bin/output_isotropic1.png");
-  (*this).display();
-}
-
-void BWImage::isotropic2(unsigned int x, unsigned int y){
-  vector<vector<float> > values(wdth, vector<float>(hght));
-  for (unsigned int i = 0; i < wdth; ++i){
-    for (unsigned int j = 0; j < hght; j++){
-      values[i][j] =  (255 - image(i,j,0,0))*(1/pow((1+(dist(x, y, i, j)/sqrt(pow(wdth,2) + pow(hght,2)))),23));
-      image(i,j,0,0) = 255 - values[i][j];//changing the image
-    }
-  }
-  image.save("bin/output_isotropic2.png");
-  (*this).display();
-}
-
-void BWImage::isotropic3(unsigned int x, unsigned int y){
-  vector<vector<float> > values(wdth, vector<float>(hght));
+  (*this).drawRect(x,y, 5, 5, 255);//white centered renctangle of pressure
   for (unsigned int i = 0; i < wdth; ++i){
     for (unsigned int j = 0; j < hght; j++){
       values[i][j] =  (255 - image(i,j,0,0))*(1/(1+pow((dist(x, y, i, j)/40), 2)));//filling the matrix of new values
@@ -361,24 +300,55 @@ void BWImage::isotropic3(unsigned int x, unsigned int y){
   (*this).display();
 }
 
+float dist_an(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, float a, float b) {
+	int x = x1 - x2; //calculating number to square in next step
+	int y = y1 - y2;
+	float dist;
+
+	dist = pow(x, 2)/a + pow(y, 2)/b;    //calculating elliptic distance depending on a and b
+	dist = sqrt(dist);
+
+	return dist;
+}
+
+void BWImage::anisotropic(unsigned int x, unsigned int y, float a, float b){
+  vector<vector<float> > values(wdth, vector<float>(hght));
+  (*this).drawRect(x,y, 5, 5, 255);//white centered renctangle of pressure
+  for (unsigned int i = 0; i < wdth; ++i){
+    for (unsigned int j = 0; j < hght; j++){
+      values[i][j] =  (255 - image(i,j,0,0))*(1/(1+pow(((dist_an(x,y,i,j,a,b)/80)), 2)));//filling the matrix of new values
+      image(i,j,0,0) = 255 - values[i][j];//changing the image
+    }
+  }
+  image.save("bin/output_unisotropic.png");
+  (*this).display();
+}
+
 int main() {
-//  CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
+  //STARTER1
+  //CImg<unsigned char> image("/home/c/castellt/MASTER/fingerprints/project/bin/clean_finger_small.png"); //uploads the image
   //CImg<unsigned char> image("clean_finger_small.png");
   CImg<unsigned char> image("clean_finger.png");
   BWImage img = BWImage(image); //creates an instance of class BWImage
-
+  //cout << "Min : " << img.minIntensity() << endl;
+  //cout << "Max : " << img.maxIntensity() << endl;
   //img.drawRect(30, 40, 50, 30, 255);
   //img.drawRect(10, 10, 50, 60, 0);
   //img.symmetry_X();
-  //img.symmetry_X();
+  //img.symmetry_Y();
   //img.symmetry_diagonal();
 
-//  img.display();
-  //cout << "Min : " << img.minIntensity() << endl;
-  //cout << "Max : " << img.maxIntensity() << endl;
-  img.drawRect((int)(img.height()/2), (int)(img.width()/2), 7, 7, 255); //center of pressure
-  img.anisotropic1((int)(img.height()/2),(int)(img.width()/2));
-
-  img.isotropic2((int)(img.height()/2),(int)(img.width()/2));
+  //MAIN1- FOR ISOTROPIC AND ANISOTROPIC
+  /*img = BWImage(image);
+  img.isotropic1((int)(img.height()/2),(int)(3*img.width()/4));
+  img = BWImage(image);
+  img.isotropic2((int)(img.height()/2),(int)(3*img.width()/4));
+  img = BWImage(image);
+  img.isotropic3((int)(img.height()/2),(int)(3*img.width()/4));
+  img.drawRect((int)(img.height()/2), (int)(3*img.width()/4), 7, 7, 255); //center of pressure
+  img.anisotropic((int)(img.height()/2),(int)(3*img.width()/4), 0.1, 0.15);//a = 0.1, b = 0.15 simulate shape of an anisotropic fingerprint
+  img = BWImage(image);
+  img.anisotropic((int)(img.height()/2),(int)(3*img.width()/4), 0.4, 1);// a = 0.4, b = 1 its a good example of an elipse
+  */
   return 0;
 }

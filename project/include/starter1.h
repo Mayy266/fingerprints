@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <vector>
 #include "CImg.h"
 #include "coord.h"
 
@@ -40,7 +41,7 @@ class BWImage {
     void isotropic1(unsigned int x, unsigned int y);
     void isotropic2(unsigned int x, unsigned int y);
     void isotropic3(unsigned int x, unsigned int y);
-    void anisotropic1(unsigned int x, unsigned int y);
+    void anisotropic(unsigned int x, unsigned int y, float a, float b);
 
 };
 
