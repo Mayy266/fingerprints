@@ -34,6 +34,7 @@ class BWImage {
     void symmetry_diagonal();
     void translation(int a, int b);
     void rotation(float theta, unsigned int x0, unsigned int y0);
+    void inverse_rotation(float theta, unsigned int x0, unsigned int y0);
     void rotation_and_fill(float theta, unsigned int x0, unsigned int y0);
     void display();
     void display_i();
