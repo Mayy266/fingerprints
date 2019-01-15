@@ -5,6 +5,8 @@
 #ifndef COORD_H
 #define COORD_H
 
+#define PI 3.14159265358979323846
+
 using namespace std;
 
 class Coord {

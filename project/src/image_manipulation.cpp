@@ -53,7 +53,7 @@ void BWImage::drawRect(unsigned int x, unsigned int y, unsigned int h, unsigned 
         image(i,j,0,0) = color;
       }
     }
-    image.save("output_images/output_rect.png"); //saves the new image
+    image.save("../project/output_images/output_rect.png"); //saves the new image
 }
 
 //symmetry along the Y axis
@@ -66,7 +66,7 @@ void BWImage::symmetry_Y(){
       image(wdth-x-1,y,0,0) = tmp;
     }
   }
-  image.save("output_images/output_symmetry_Y.png"); //saves the new image
+  image.save("../project/output_images/output_symmetry_Y.png"); //saves the new image
 }
 
 //symmetry along the X axis
@@ -79,7 +79,7 @@ void BWImage::symmetry_X(){
       image(x,hght-y-1,0,0) = tmp;
     }
   }
-  image.save("output_images/output_symmetry_X.png"); //saves the new image
+  image.save("../project/output_images/output_symmetry_X.png"); //saves the new image
 }
 
 //symmetry along the diagonal
@@ -94,7 +94,7 @@ void BWImage::symmetry_diagonal(){
     }
   }
   drawRect(0, 0, hght-wdth, wdth, 255); //it sets the top part of the image to white
-  image.save("output_images/output_symmetry_diag.png"); //saves the new image
+  image.save("../project/output_images/output_symmetry_diag.png"); //saves the new image
 }
 
 void BWImage::translation(int a, int b){
@@ -132,7 +132,7 @@ void BWImage::translation(int a, int b){
     }
     delete[] tmpPict;
 
-    image.save("output_images/output_translation.png"); //saves the new image
+    image.save("../project/output_images/output_translation.png"); //saves the new image
 }
 
 void BWImage::rotation(float theta, unsigned int x0, unsigned int y0){
@@ -169,7 +169,7 @@ void BWImage::rotation(float theta, unsigned int x0, unsigned int y0){
   }
   delete[] tmpPict;
 
-  image.save("output_images/output_rotation.png"); //saves the new image
+  image.save("../project/output_images/output_rotation.png"); //saves the new image
 }
 
 
@@ -216,7 +216,7 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
   }
   delete[] tmpPict;
 
-  image.save("output_images/output_rotation_fill.png"); //saves the new image
+  image.save("../project/output_images/output_rotation_fill.png"); //saves the new image
 }
 
 
@@ -268,7 +268,7 @@ void BWImage::isotropic1(unsigned int x, unsigned int y){
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("output_images/output_isotropic1.png");
+  image.save("../project/output_images/output_isotropic1.png");
   (*this).display();
 }
 
@@ -292,7 +292,7 @@ void BWImage::isotropic2(unsigned int x, unsigned int y){
       //changing the image
     }
   }
-  image.save("output_images/output_isotropic2.png");
+  image.save("../project/output_images/output_isotropic2.png");
   (*this).display();
 }
 
@@ -305,7 +305,7 @@ void BWImage::isotropic3(unsigned int x, unsigned int y){
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("output_images/output_isotropic3.png");
+  image.save("../project/output_images/output_isotropic3.png");
   (*this).display();
 }
 
@@ -318,7 +318,7 @@ void BWImage::isotropicGauss(unsigned int x, unsigned int y, float alpha){
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("output_images/output_isotropicGauss.png");
+  image.save("../project/output_images/output_isotropicGauss.png");
   (*this).display();
 }
 
@@ -367,7 +367,7 @@ void BWImage::anisotropic2(unsigned int x, unsigned int y, float a, float b){
       }
     }
   }
-  image.save("output_images/output_anisotropic2-test.png");
+  image.save("../project/output_images/output_anisotropic2-test.png");
   (*this).display();
 }
 
@@ -380,7 +380,7 @@ void BWImage::anisotropicGauss(unsigned int x, unsigned int y, float a, float b,
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("output_images/output_isotropicGauss.png");
+  image.save("../project/output_images/output_isotropicGauss.png");
   (*this).display();
 }
 

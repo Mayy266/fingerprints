@@ -1,20 +1,22 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
+//#include <Eigen/Dense>
 #include <vector>
 #include "CImg.h"
 #include "coord.h"
 
 
-#ifndef STARTER
-#define STARTER
+#ifndef IMAGE_H
+#define IMAGE_H
 
 using namespace cimg_library;
 using namespace std;
 
 
 class BWImage {
+  friend float optimize(BWImage img1, BWImage img2);
   private:
     // we will be using unsigned int all the time because the parameters of the CImg class use it,
     // and also because the coordinates and pixel intensity of a picture are positive numbers.
