@@ -24,7 +24,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 MESSAGE(STATUS ${PROJ_LIBRARY_DIRS})
 
 add_executable(fingerprints
-	${SOURCES}
+	"./src/image_manipulation.cpp" "./src/coord.cpp"
 )
 MESSAGE(STATUS ${CIMG_LIBRARIES})
 target_link_libraries(fingerprints ${CImg_LIBRARIES})

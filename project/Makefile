@@ -7,7 +7,7 @@ DOCS=docs
 HDRS=$(wildcard ${INC}/*.h)
 SRCS=$(wildcard ${SRC}/*.cpp)
 OBJS=$(patsubst ${SRC}/%.cpp, ${BIN}/%.o, ${SRCS})
-TARGET_BINARY=${BIN}/starter1
+TARGET_BINARY=${BIN}/image_manipulation
 
 CXX ?= clang++
 CXXFLAGS += -I${INC} -g -std=c++14 -pedantic-errors -Wall -Wextra

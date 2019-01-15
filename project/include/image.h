@@ -41,7 +41,10 @@ class BWImage {
     void isotropic1(unsigned int x, unsigned int y);
     void isotropic2(unsigned int x, unsigned int y);
     void isotropic3(unsigned int x, unsigned int y);
+    void isotropicGauss(unsigned int x, unsigned int y, float alpha);
     void anisotropic(unsigned int x, unsigned int y, float a, float b);
+    void anisotropic2(unsigned int x, unsigned int y, float a, float b);
+    void anisotropicGauss(unsigned int x, unsigned int y, float a, float b, float alpha);
 
 };
 
