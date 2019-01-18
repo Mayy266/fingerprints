@@ -1,3 +1,4 @@
+
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -13,6 +14,7 @@
 
 using namespace cimg_library;
 using namespace std;
+//using namespace Eigen;
 
 
 class BWImage {
@@ -24,7 +26,7 @@ class BWImage {
     unsigned int hght;
     unsigned int wdth;
   public:
-    BWImage(CImg<unsigned char> image); //constructor
+    BWImage(CImg<unsigned char> image);
     float toFloat(unsigned int x, unsigned int y);
     unsigned int maxIntensity();
     unsigned int minIntensity();
@@ -33,9 +35,12 @@ class BWImage {
     void symmetry_Y();
     void symmetry_diagonal();
     void translation(int a, int b);
-    void rotation(float theta, unsigned int x0, unsigned int y0);
+    void rotation(float theta, unsigned int x0, unsigned int y0); // simple rotation
+    void rotation2(float theta, unsigned int x0, unsigned int y0); // rotation + filling of the lost information
+    void rotation3(float theta, unsigned int x0, unsigned int y0); // optimized rotation to minimize the lost of information
     void inverse_rotation(float theta, unsigned int x0, unsigned int y0);
-    void rotation_and_fill(float theta, unsigned int x0, unsigned int y0);
+    unsigned int bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4, unsigned int intensity1,
+      unsigned int intensity2, unsigned int intensity3, unsigned int intensity4);
     void display();
     void display_i();
     void display_f();

@@ -25,7 +25,7 @@ unsigned int BWImage::maxIntensity(){
 
 //returns the minimum value of the intensity of the pixels
 unsigned int BWImage::minIntensity(){
-  unsigned int min = 255;
+  unsigned int min = 256;
 
   for (CImg<unsigned char>::iterator i = image.begin(); i != image.end(); ++i){
     if(*i < min){
@@ -84,7 +84,6 @@ void BWImage::symmetry_X(){
 //symmetry along the diagonal
 void BWImage::symmetry_diagonal(){
   unsigned int h = (hght%2 == 1 ? hght - 1 : hght); //checks wether the height of the image is even or odd
-  unsigned int w = (wdth%2 == 1 ? wdth - 1 : wdth); //checks wether the width of the image is even or odd
   for (unsigned int y = hght-wdth; y < h; y++){
     for (unsigned int x = 0; x < (unsigned int)(y-(hght-wdth)); x++){
       unsigned int tmp = image(x,y,0,0);
@@ -104,17 +103,14 @@ void BWImage::translation(int a, int b){
     for (unsigned int i = 0; i < wdth; i++){
       tmpPict[i] = new unsigned int[hght];
       for (unsigned int j = 0; j < hght; j++){
-        tmpPict[i][j] = 255;
+        tmpPict[i][j] = 0;
       }
     }
 
-    unsigned int h = (hght%2 == 1 ? hght - 1 : hght); //checks wether the height of the image is even or odd
-    unsigned int w = (wdth%2 == 1 ? wdth - 1 : wdth); //checks wether the width of the image is even or odd
-    for (unsigned int y = 0; y < h; y++){
-      for (unsigned int x = 0; x < w; x++){
+    for (unsigned int y = 0; y < hght; y++){
+      for (unsigned int x = 0; x < wdth; x++){
         Coord c = Coord(x,y);
         c.translation(a, b);
-        //if(c.getX()>=0 && c.getY()>=0 && c.getX()<wdth && c.getY()<hght){
         if(c.getX()<wdth && c.getY()<hght){
           tmpPict[c.getX()][c.getY()] = image(x,y,0,0);
         }
@@ -126,13 +122,54 @@ void BWImage::translation(int a, int b){
         image(i,j,0,0) = tmpPict[i][j];
       }
     }
-
+    //deletes the temporary matrix
     for (unsigned int i = 0; i < wdth; i++){
       delete[] tmpPict[i];
     }
     delete[] tmpPict;
 
     image.save("../project/output_images/output_translation.png"); //saves the new image
+}
+
+
+// To do: EIGEN
+
+
+//inverse rotation of the image
+void BWImage::inverse_rotation(float theta, unsigned int x0, unsigned int y0){
+
+  //we create a new matrix
+  unsigned int** tmpPict = new unsigned int*[wdth];
+
+  for (unsigned int i = 0; i < wdth; i++){
+    tmpPict[i] = new unsigned int[hght];
+    for (unsigned int j = 0; j < hght; j++){
+      tmpPict[i][j] = 0;
+    }
+  }
+  for (unsigned int y = 0; y < hght; y++){
+    for (unsigned int x = 0; x < wdth; x++){
+      Coord c = Coord(x,y);
+      c.inverse_rotation(theta, x0, y0); //uses the inverse function of rotation to rotate the coordinates
+      if(c.getX()<wdth && c.getY()<hght){
+        tmpPict[c.getX()][c.getY()] = image(x,y,0,0);//fills the matrix wih the intensity values of the image
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      image(i,j,0,0) = tmpPict[i][j]; //we copy the values of the matrix into the initial image
+    }
+  }
+  //we delete the temporary matrix
+  for (unsigned int i = 0; i < wdth; i++){
+    delete[] tmpPict[i];
+  }
+  delete[] tmpPict;
+
+  //image.save("bin/outputs/output_inverse_rotation.png"); //saves the new image
+  image.save("../project/output_images/output_inverse_rotation.png");
 }
 
 //rotation of the image
@@ -158,19 +195,19 @@ void BWImage::rotation(float theta, unsigned int x0, unsigned int y0){
   for (unsigned int y = 0; y < hght; y++){
     for (unsigned int x = 0; x < wdth; x++){
       Coord c = Coord(x,y);
-      c.rotation(theta, x0, y0);
+      c.rotation(theta, x0, y0);//uses the rotation function to rotate the coordinates
       if(c.getX()<wdth && c.getY()<hght){
-        tmpPict[c.getX()][c.getY()] = image(x,y,0,0);
+        tmpPict[c.getX()][c.getY()] = image(x,y,0,0);//fills the matrix wih the intensity values of the image
       }
     }
   }
 
   for (unsigned int i = 0; i < wdth; i++){
     for (unsigned int j = 0; j < hght; j++){
-      image(i,j,0,0) = tmpPict[i][j];
+      image(i,j,0,0) = tmpPict[i][j];//we copy the values of the matrix into the initial image
     }
   }
-
+  //we delete the temporary matrix
   for (unsigned int i = 0; i < wdth; i++){
     delete[] tmpPict[i];
   }
@@ -180,46 +217,13 @@ void BWImage::rotation(float theta, unsigned int x0, unsigned int y0){
   image.save("../project/output_images/output_rotation.png");
 }
 
-//inverse rotation of the image
-void BWImage::inverse_rotation(float theta, unsigned int x0, unsigned int y0){
-
-  //initializes a temporary matrix, it is used to do the rotation
-  unsigned int** tmpPict = new unsigned int*[wdth];
-
-  for (unsigned int i = 0; i < wdth; i++){
-    tmpPict[i] = new unsigned int[hght];
-    for (unsigned int j = 0; j < hght; j++){
-      tmpPict[i][j] = 0;
-    }
-  }
-  for (unsigned int y = 0; y < hght; y++){
-    for (unsigned int x = 0; x < wdth; x++){
-      Coord c = Coord(x,y);
-      c.inverse_rotation(theta, x0, y0);
-      if(c.getX()<wdth && c.getY()<hght){
-        tmpPict[c.getX()][c.getY()] = image(x,y,0,0);
-      }
-    }
-  }
-
-  for (unsigned int i = 0; i < wdth; i++){
-    for (unsigned int j = 0; j < hght; j++){
-      image(i,j,0,0) = tmpPict[i][j];
-    }
-  }
-
-  for (unsigned int i = 0; i < wdth; i++){
-    delete[] tmpPict[i];
-  }
-  delete[] tmpPict;
-
-  //image.save("bin/outputs/output_inverse_rotation.png"); //saves the new image
-  image.save("../project/output_images/output_inverse_rotation.png");
-}
-
-
 //rotation and filling of the lost information
-void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
+//method :
+// 1. apply the rotation on each pixels' coordinates
+//    (during this step, we lose information because we get floating values,
+//    and we cast them as integers tu use them as coordinates).
+// 2. fill the lost information using bilinear interpoation.
+void BWImage::rotation2(float theta, unsigned int x0, unsigned int y0){
 
   //initializes a temporary matrix, used to do the rotation
   unsigned int** tmpPict = new unsigned int*[wdth]; //we create a temporary matrix
@@ -233,29 +237,53 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
   for (unsigned int y = 0; y < hght; y++){
     for (unsigned int x = 0; x < wdth; x++){
       Coord c = Coord(x,y);
-      c.rotation(theta, x0, y0);
+      c.rotation(theta, x0, y0); //we rotate the coordinates
       if(c.getX()<wdth && c.getY()<hght){
         tmpPict[c.getX()][c.getY()] = image(x,y,0,0); //we fill the temporary matrix with the rotated image
       }
     }
   }
 
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      unsigned int k = 1;
+      while(k<4 && j+k<hght && tmpPict[i][j+k]==300){ //in Y axis, whenever we have more than 4 "300" values in a row (it means we are in the corners) we fill everything with white
+        k++;
+      }
+      if(k==4){
+        tmpPict[i][j] = 0;
+      }
+      else{
+        k = 1;
+        while(k<4 && i+k<wdth && tmpPict[i+k][j]==300){ //in X axis, whenever we have more than 4 "300" values in a row (it means we are in the corners) we fill everything with white
+          k++;
+        }
+        if(k==4){
+          tmpPict[i][j] = 0;
+        }
+      }
+    }
+  }
+
   unsigned int p1, p2, p3, p4 = 0;
-  unsigned int lim = 4;
-  for (unsigned int i = 5; i < wdth-5; i++){
-    for (unsigned int j = 5; j < hght-5; j++){
+  Coord cp1, cp2, cp3, cp4;
+  unsigned int lim = 4; //we set the limit so we don't go to far from the pixel we want to interpolate (to differentiate corners from the actual picture)
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
       if(tmpPict[i][j] == 300){
-        // first loop (upper right corner) : (k, k-l-1)
         unsigned int l, k;
 
+        // first loop (upper right corner) : (k, k-l-1)
         k = 0;
         while(k<lim){
           l = 0;
-          while(l<lim && tmpPict[i+k][j+k-l-1]==300){ // +1 or -1 ?
+          while(l<lim && i+k<wdth && i+k>0 && j+k-l-1<hght && j+k-l-1>0 && tmpPict[i+k][j+k-l-1]==300){ // border conditions, it detects the pixel which we want to use to interpolate
             l++;
           }
-          if(l<lim){
+          if(l<lim && i+k<wdth && i+k>0 && j+k-l-1<hght && j+k-l-1>0){//border conditions, we go inside this loop only if we find a non-300 value
             p1 = tmpPict[i+k][j+k-l+1];
+            cp1.setX(i+k); //we save the coordinates of the points that we are using to interpolate
+            cp1.setY(j+k-l+1); //so we can use them in the function 'interpolation'
             break;
           }
           k++;
@@ -264,11 +292,13 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
         k = 0;
         while(k<lim){
           l = 0;
-          while(l<lim && tmpPict[i+l-k+1][j+l]==300){
+          while(l<lim && i+l-k+1<wdth && i+l-k+1>0 && j+l<hght && j+l>0 && tmpPict[i+l-k+1][j+l]==300){// border conditions, it detects the pixel which we want to use to interpolate
             l++;
           }
-          if(l<lim){
+          if(l<lim && i+l-k+1<wdth && i+l-k+1>0 && j+l<hght && j+l>0){//border conditions, we go inside this loop only if we find a non-300 value
             p2 = tmpPict[i+l-k+1][j+l];
+            cp2.setX(i+l-k+1);//we save the coordinates of the points that we are using to interpolate
+            cp2.setY(j+l);//so we can use them in the function 'interpolation'
             break;
           }
           k++;
@@ -277,11 +307,13 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
         k = 0;
         while(k<lim){
           l = 0;
-          while(l<lim && tmpPict[i+k-l][j+k+1]==300){
+          while(l<lim && i+k-l<wdth && i+k-l>0 && j+k+1<hght && j+k+1>0 && tmpPict[i+k-l][j+k+1]==300){// border conditions, it detects the pixel which we want to use to interpolate
             l++;
           }
-          if(l<lim){
+          if(l<lim && i+k-l<wdth && i+k-l>0 && j+k+1<hght && j+k+1>0){//border conditions, we go insi//border conditions, we go inside this loop only if we find a non-300 value de this loop only if we find a non-300 value
             p3 = tmpPict[i+k-l][j+k+1];
+            cp3.setX(i+k-l);//we save the coordinates of the points that we are using to interpolate
+            cp3.setY(j+k+1);//so we can use them in the function 'interpolation'
             break;
           }
           k++;
@@ -289,26 +321,81 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
         // fourth loop (upper left corner) : (-l-1+k, -k)
         k = 0;
         while(k<lim){
-           l = 0;
-          while(l<lim && tmpPict[i-l-1+k][j-k]==300){
+          l = 0;
+          while(l<lim && i-l-1+k<wdth && i-l-1+k>0 && j-k<hght && j-k>0 && tmpPict[i-l-1+k][j-k]==300){// border conditions, it detects the pixel which we want to use to interpolate
             l++;
           }
-          if(l<lim){
+          if(l<lim && i-l-1+k<wdth && i-l-1+k>0 && j-k<hght && j-k>0){//border conditions, we go inside this loop only if we find a non-300 value
             p4 = tmpPict[i-l-1+k][j-k];
+            cp4.setX(i-l-1+k);//we save the coordinates of the points that we are using to interpolate
+            cp4.setY(j-k);//so we can use them in the function 'interpolation'
             break;
           }
           k++;
         }
 
         // we compute the bilinear interpolation with the four pixels :
-        tmpPict[i][j] = (p1+p2+p3+p4)/4;
+        tmpPict[i][j] = bilinear_interpolation(cp1, cp2, cp3, cp4, p1, p2, p3, p4);
       }
     }
   }
 
+
   for (unsigned int i = 0; i < wdth; i++){
     for (unsigned int j = 0; j < hght; j++){
-      image(i,j,0,0) = tmpPict[i][j];
+      image(i,j,0,0) = tmpPict[i][j];//we copy the values of the matrix into the initial image
+    }
+  }
+
+
+  for (unsigned int i = 0; i < wdth; i++){ //we delete the temporary matrix
+    delete[] tmpPict[i];
+  }
+  delete[] tmpPict;
+
+  image.save("../project/output_images/output_rotation2.png"); //saves the new image
+}
+
+
+//rotation optimized to avoid the lost of information
+//method :
+// 1. compute the coordinates of the rotated picture in the starting picture using inverse rotation function (coordinates as floats)
+// 2. compute the pixel intensity value of the pixel in the rotated picture using bilinear interpolation with the 4 nearest pixels in the starting picture.
+void BWImage::rotation3(float theta, unsigned int x0, unsigned int y0){
+
+  //initializes a temporary matrix, used to do the rotation
+  unsigned int** tmpPict = new unsigned int*[wdth]; //we create a temporary matrix
+
+  for (unsigned int x = 0; x < wdth; x++){
+    tmpPict[x] = new unsigned int[hght];
+    for (unsigned int y = 0; y < hght; y++){
+      Coord c = Coord(x,y);
+      c.inverse_rotation(theta, x0, y0); //computes the coordinates in the starting picture of the pixel (x,y) of the rotated picture.
+      if(c.getX_f()<0 || c.getX_f()>=wdth || c.getY_f()<0 || c.getY_f()>=hght){tmpPict[x][y] = 0;} // if we are outside the boundaries of the starting picture, we put a black pixel
+      else{
+
+        //find 4 close enough neighboors of the pixel in the starting picture.
+        // 1. coordiates :
+        Coord cp1 = Coord(floor(c.getX_f()), floor(c.getY_f()));
+        Coord cp2= Coord(floor(c.getX_f()), ceil(c.getY_f()));
+        Coord cp3 = Coord(ceil(c.getX_f()), floor(c.getY_f()));
+        Coord cp4 = Coord(ceil(c.getX_f()), ceil(c.getY_f()));
+        // 2. pixels intensity values :
+        unsigned int p1 = image(cp1.getX(),cp1.getY(),0,0);
+        unsigned int p2 = image(cp2.getX(),cp2.getY(),0,0);
+        unsigned int p3 = image(cp3.getX(),cp3.getY(),0,0);
+        unsigned int p4 = image(cp4.getX(),cp4.getY(),0,0);
+
+        //compute the bilinear interpolation of this pixel intensity value using the four neighboors intensity value and distance :
+        tmpPict[x][y] = bilinear_interpolation(cp1, cp2, cp3, cp4, p1, p2, p3, p4);;
+      }
+    }
+  }
+
+
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      image(i,j,0,0) = tmpPict[i][j];//we copy the values of the matrix into the initial image
     }
   }
 
@@ -317,7 +404,32 @@ void BWImage::rotation_and_fill(float theta, unsigned int x0, unsigned int y0){
   }
   delete[] tmpPict;
 
-  image.save("../project/output_images/output_rotation_fill.png"); //saves the new image
+  image.save("../project/output_images/output_rotation3.png"); //saves the new image
+}
+
+
+//interpolation using 4 points
+unsigned int BWImage::bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4,
+  unsigned int intensity1, unsigned int intensity2, unsigned int intensity3, unsigned int intensity4){
+
+  Coord center = Coord((float)((p1.getX_f()+p2.getX_f()+p3.getX_f()+p4.getX_f())/4.0), (float)((p1.getY_f()+p2.getY_f()+p3.getY_f()+p4.getY_f())/4.0)); //we compute the coordinates of the center of the 4 points
+
+  float a = -p1.getX_f() + p3.getX_f();
+  float b = -p1.getX_f() + p2.getX_f();
+  float c = p1.getX_f() - p2.getX_f() - p3.getX_f() + p4.getX_f();
+  float d = center.getX_f() - p1.getX_f();
+  float e = -p1.getY_f() + p3.getY_f();
+  float f = -p1.getY_f() + p2.getY_f();
+  float g = p1.getY_f() - p2.getY_f() - p3.getY_f() + p4.getY_f();
+  float h = center.getY_f() - p1.getY_f();
+
+  // in case we encounter a division by 0, we set alpha to zero
+  float alpha = (2*c*e - 2*a*g == 0 ? 0 : -(b*e - a*f + d*g - c*h + sqrt(-4*(c*e - a*g)*(d*f - b*h) + pow(b*e - a*f + d*g - c*h,2) ))/(2*c*e - 2*a*g));
+  // in case we encounter a division by 0, we set beta to zero
+  float beta  = (2*c*f - 2*b*g == 0 ? 0 :  (b*e - a*f - d*g + c*h + sqrt(-4*(c*e - a*g)*(d*f - b*h) + pow(b*e - a*f + d*g - c*h,2) ))/(2*c*f - 2*b*g));
+
+  unsigned int newIntensity = (1.0 - alpha) * ((1.0 - beta) * (float)intensity1 + beta * (float)intensity2) + alpha * ((1.0 - beta) * (float)intensity3 + beta * (float)intensity4);
+  return newIntensity;
 }
 
 //displays the image
@@ -353,7 +465,7 @@ float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
   int x = (x1 - x2); //calculating number to square in next step
   int y = (y1 - y2);
   float dist;
-  dist = pow(x, 2) + pow(y, 2);    //calculating elliptic distance depending on a and b
+  dist = pow(x, 2) + pow(y, 2);    //calculating distance
   dist = sqrt(dist);
 	return dist;
 }
@@ -480,41 +592,6 @@ void BWImage::anisotropicGauss(unsigned int x, unsigned int y, float a, float b,
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("../project/output_images/output_anisotropicGauss.png");
+  image.save("../project/output_images/output_isotropicGauss.png");
   (*this).display();
 }
-
-/*
-int main(int argc, char const *argv[]) {
-//int main(){
-  //STARTER1
-  //CImg<unsigned char> image("clean_finger_small.png");
-  CImg<unsigned char> image(argv[1]);
-  //CImg<unsigned char> image("clean_finger.png");
-  BWImage img = BWImage(image); //creates an instance of class BWImage
-  //cout << "Min : " << img.minIntensity() << endl;
-  //cout << "Max : " << img.maxIntensity() << endl;
-  //img.drawRect(30, 40, 50, 30, 255);
-  //img.drawRect(10, 10, 50, 60, 0);
-  //img.display();
-  //img.symmetry_X();
-  //img.symmetry_Y();
-  //img.symmetry_diagonal();
-
-  img.translation(40,44);
-
-  //MAIN1- FOR ISOTROPIC AND ANISOTROPIC
-  img = BWImage(image);
-  img.isotropic1((int)(img.height()/2),(int)(3*img.width()/4));
-  img = BWImage(image);
-  img.isotropic2((int)(img.height()/2),(int)(3*img.width()/4));
-  img = BWImage(image);
-  img.isotropic3((int)(img.height()/2),(int)(3*img.width()/4));
-  img.drawRect((int)(img.height()/2), (int)(3*img.width()/4), 7, 7, 255); //center of pressure
-  img.anisotropic((int)(img.height()/2),(int)(3*img.width()/4), 0.1, 0.15);//a = 0.1, b = 0.15 simulate shape of an anisotropic fingerprint
-  img = BWImage(image);
-  img.anisotropic((int)(img.height()/2),(int)(3*img.width()/4), 0.4, 1);// a = 0.4, b = 1 its a good example of an elipse
-
-  return 0;
-}
-*/

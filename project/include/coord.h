@@ -11,14 +11,18 @@ using namespace std;
 
 class Coord {
   private:
-    unsigned int x;
-    unsigned int y;
+    float x;
+    float y;
   public:
+    Coord();
+    Coord(float x, float y);
     Coord(unsigned int x, unsigned int y);
     unsigned int getX();
     unsigned int getY();
-    void setX(unsigned int a);
-    void setY(unsigned int b);
+    float getX_f();
+    float getY_f();
+    void setX(float a);
+    void setY(float b);
     void display();
     void translation(int a, int b);
     void rotation(float theta, unsigned int x0, unsigned int y0);
