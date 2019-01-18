@@ -25,7 +25,7 @@ unsigned int BWImage::maxIntensity(){
 
 //returns the minimum value of the intensity of the pixels
 unsigned int BWImage::minIntensity(){
-  unsigned int min = 256;
+  unsigned int min = 255;
 
   for (CImg<unsigned char>::iterator i = image.begin(); i != image.end(); ++i){
     if(*i < min){
@@ -480,7 +480,7 @@ void BWImage::anisotropicGauss(unsigned int x, unsigned int y, float a, float b,
       image(i,j,0,0) = 255 - values[i][j];//changing the image
     }
   }
-  image.save("../project/output_images/output_isotropicGauss.png");
+  image.save("../project/output_images/output_anisotropicGauss.png");
   (*this).display();
 }
 

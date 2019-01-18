@@ -2,9 +2,12 @@
 #include <cstdlib>
 #include <cassert>
 #include <vector>
+#include <iostream>
+//#include <Eigen/Dense>
 
 using namespace cimg_library;
 using namespace std;
+//using namespace Eigen;
 
 vector<vector<float>> operator-(BWImage img1, BWImage img2){
   assert(img1.height() == img2.height() && img1.width() == img2.width());

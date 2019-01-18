@@ -24,7 +24,7 @@ class BWImage {
     unsigned int hght;
     unsigned int wdth;
   public:
-    BWImage(CImg<unsigned char> image);
+    BWImage(CImg<unsigned char> image); //constructor
     float toFloat(unsigned int x, unsigned int y);
     unsigned int maxIntensity();
     unsigned int minIntensity();

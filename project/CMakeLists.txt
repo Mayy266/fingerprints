@@ -25,6 +25,7 @@ find_package(Eigen3 REQUIRED)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS}")
 
 include_directories(${CImg_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 MESSAGE(STATUS ${PROJ_LIBRARY_DIRS})
 
@@ -33,3 +34,4 @@ add_executable(fingerprints
 )
 MESSAGE(STATUS ${CIMG_LIBRARIES})
 target_link_libraries(fingerprints ${CImg_LIBRARIES})
+#target_link_libraries(fingerprints Eigen3::Eigen)
