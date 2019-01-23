@@ -28,10 +28,13 @@ include_directories(${CImg_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 MESSAGE(STATUS ${PROJ_LIBRARY_DIRS})
+add_subdirectory(src)
+add_subdirectory(demo)
+add_subdirectory(test)
 
-add_executable(fingerprints
-	"./src/image_manipulation.cpp" "./src/coord.cpp" "./src/optimize.cpp" "./src/main.cpp"
-)
+#add_executable(fingerprints
+#	"./src/image_manipulation.cpp" "./src/coord.cpp" "./src/optimize.cpp" "./src/main.cpp"
+#)
 MESSAGE(STATUS ${CIMG_LIBRARIES})
-target_link_libraries(fingerprints ${CImg_LIBRARIES})
+#target_link_libraries(fingerprints ${CImg_LIBRARIES} ${Eigen_LIBS})
 #target_link_libraries(fingerprints Eigen3::Eigen)
