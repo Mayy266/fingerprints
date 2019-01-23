@@ -1,5 +1,26 @@
 #include "image.h"
 
+//returns the distance between two pixels
+float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
+  int x = (x1 - x2); //calculating number to square in next step
+  int y = (y1 - y2);
+  float dist;
+  dist = pow(x, 2) + pow(y, 2);    //calculating distance
+  dist = sqrt(dist);
+    return dist;
+}
+
+//returns the elliptic distance depending on a and b
+float dist_an(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, float a, float b) {
+    int x = (x1 - x2); //calculating number to square in next step
+    int y = (y1 - y2);
+    float dist;
+    dist = pow(x, 2)/a + pow(y, 2)/b;    //calculating elliptic distance depending on a and b
+    dist = sqrt(dist);
+
+    return dist;
+}
+
 //constuctor
 BWImage::BWImage(CImg<unsigned char> img):image(img){
   image.channel(0);
@@ -103,7 +124,7 @@ void BWImage::translation(int a, int b){
     for (unsigned int i = 0; i < wdth; i++){
       tmpPict[i] = new unsigned int[hght];
       for (unsigned int j = 0; j < hght; j++){
-        tmpPict[i][j] = 0;
+        tmpPict[i][j] = 255;
       }
     }
 
@@ -365,33 +386,37 @@ void BWImage::rotation3(float theta, unsigned int x0, unsigned int y0){
 
   //initializes a temporary matrix, used to do the rotation
   unsigned int** tmpPict = new unsigned int*[wdth]; //we create a temporary matrix
-
   for (unsigned int x = 0; x < wdth; x++){
     tmpPict[x] = new unsigned int[hght];
     for (unsigned int y = 0; y < hght; y++){
       Coord c = Coord(x,y);
       c.inverse_rotation(theta, x0, y0); //computes the coordinates in the starting picture of the pixel (x,y) of the rotated picture.
-      if(c.getX_f()<0 || c.getX_f()>=wdth || c.getY_f()<0 || c.getY_f()>=hght){tmpPict[x][y] = 0;} // if we are outside the boundaries of the starting picture, we put a black pixel
+      if(c.getX_f()<0 || c.getX_f()>=wdth || c.getY_f()<0 || c.getY_f()>=hght){tmpPict[x][y] = 255 ;} // if we are outside the boundaries of the starting picture, we put a black pixel
       else{
+        if(abs(c.getX_f()-c.getX()) < EPSILON && abs(c.getY_f()-c.getY()) < EPSILON){ // if we get rounded coordinates
+          tmpPict[x][y] = image(c.getX(),c.getY(),0,0);
+        }
+        else{
+          //find 4 close enough neighboors of the pixel in the starting picture.
+          // 1. coordiates :
+          Coord cp1 = Coord(floor(c.getX_f()), floor(c.getY_f()));
+          Coord cp2 = Coord(ceil(c.getX_f()), floor(c.getY_f()));
+          Coord cp3= Coord(floor(c.getX_f()), ceil(c.getY_f()));
+          Coord cp4 = Coord(ceil(c.getX_f()), ceil(c.getY_f()));
 
-        //find 4 close enough neighboors of the pixel in the starting picture.
-        // 1. coordiates :
-        Coord cp1 = Coord(floor(c.getX_f()), floor(c.getY_f()));
-        Coord cp2= Coord(floor(c.getX_f()), ceil(c.getY_f()));
-        Coord cp3 = Coord(ceil(c.getX_f()), floor(c.getY_f()));
-        Coord cp4 = Coord(ceil(c.getX_f()), ceil(c.getY_f()));
-        // 2. pixels intensity values :
-        unsigned int p1 = image(cp1.getX(),cp1.getY(),0,0);
-        unsigned int p2 = image(cp2.getX(),cp2.getY(),0,0);
-        unsigned int p3 = image(cp3.getX(),cp3.getY(),0,0);
-        unsigned int p4 = image(cp4.getX(),cp4.getY(),0,0);
 
-        //compute the bilinear interpolation of this pixel intensity value using the four neighboors intensity value and distance :
-        tmpPict[x][y] = bilinear_interpolation(cp1, cp2, cp3, cp4, p1, p2, p3, p4);;
+          // 2. pixels intensity values :
+          unsigned int p1 = image(cp1.getX(),cp1.getY(),0,0);
+          unsigned int p2 = image(cp2.getX(),cp2.getY(),0,0);
+          unsigned int p3 = image(cp3.getX(),cp3.getY(),0,0);
+          unsigned int p4 = image(cp4.getX(),cp4.getY(),0,0);
+
+          //compute the bilinear interpolation of this pixel intensity value using the four neighboors intensity value and distance :
+          tmpPict[x][y] = bilinear_interpolation2(c, cp1, cp4, p1, p2, p3, p4);
+        }
       }
     }
   }
-
 
   for (unsigned int i = 0; i < wdth; i++){
     for (unsigned int j = 0; j < hght; j++){
@@ -408,9 +433,8 @@ void BWImage::rotation3(float theta, unsigned int x0, unsigned int y0){
 }
 
 
-//interpolation using 4 points
-unsigned int BWImage::bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4,
-  unsigned int intensity1, unsigned int intensity2, unsigned int intensity3, unsigned int intensity4){
+//interpolation using 4 not aligned points
+unsigned int BWImage::bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4, unsigned int value1, unsigned int value2, unsigned int value3, unsigned int value4){
 
   Coord center = Coord((float)((p1.getX_f()+p2.getX_f()+p3.getX_f()+p4.getX_f())/4.0), (float)((p1.getY_f()+p2.getY_f()+p3.getY_f()+p4.getY_f())/4.0)); //we compute the coordinates of the center of the 4 points
 
@@ -428,9 +452,108 @@ unsigned int BWImage::bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord
   // in case we encounter a division by 0, we set beta to zero
   float beta  = (2*c*f - 2*b*g == 0 ? 0 :  (b*e - a*f - d*g + c*h + sqrt(-4*(c*e - a*g)*(d*f - b*h) + pow(b*e - a*f + d*g - c*h,2) ))/(2*c*f - 2*b*g));
 
-  unsigned int newIntensity = (1.0 - alpha) * ((1.0 - beta) * (float)intensity1 + beta * (float)intensity2) + alpha * ((1.0 - beta) * (float)intensity3 + beta * (float)intensity4);
+  unsigned int newIntensity = (1.0 - alpha) * ((1.0 - beta) * (float)value1 + beta * (float)value2) + alpha * ((1.0 - beta) * (float)value3 + beta * (float)value4);
   return newIntensity;
 }
+
+
+
+//interpolation using 4 aligned points
+// p1 upper left point and p2 down right point
+unsigned int BWImage::bilinear_interpolation2(Coord c, Coord p1, Coord p2, unsigned int value1, unsigned int value2, unsigned int value3, unsigned int value4){
+
+      float x2x1 = p2.getX_f() - p1.getX_f();
+      float y2y1 = p2.getY_f() - p1.getY_f();
+      float x2x = p2.getX_f() - c.getX_f();
+      float y2y = p2.getY_f() - c.getY_f();
+      float yy1 = c.getY_f() - p1.getY_f();
+      float xx1 = c.getX_f() - p1.getX_f();
+      return (unsigned int)((1.0 / (x2x1 * y2y1)) * ((float)value1 * x2x * y2y + (float)value2 * xx1 * y2y + (float)value3 * x2x * yy1 + (float)value4 * xx1 * yy1));
+}
+
+
+
+// Apply a local rotation around (x0, y0), on the distance "dist", with an angle "theta".
+// m is a decreasing speed parameter
+// We use the same algorithm than in "rotation3" (inverse_rotation + interpolation).
+void BWImage::local_rotation(float theta, unsigned int x0, unsigned int y0, float dist_max, float m){
+
+    //initializes a temporary matrix, used to do the rotation
+    unsigned int** tmpPict = new unsigned int*[wdth]; //we create a temporary matrix
+    float t; // current angle (depending on the distance)
+    float d; // current distance to (x0, y0)
+
+    for (unsigned int x = 0; x < wdth; x++){
+      tmpPict[x] = new unsigned int[hght];
+      for (unsigned int y = 0; y < hght; y++){
+        Coord c = Coord(x,y);
+        d = dist(x0, y0, c.getX(), c.getY());
+        if(d<=dist_max){
+          t = theta*pow((1-(d/dist_max)), m);
+        }
+        else{
+          t=0;
+        }
+        c.inverse_rotation(t, x0, y0); //computes the coordinates in the starting picture of the pixel (x,y) of the rotated picture.
+        if(c.getX_f()<0 || c.getX_f()>=wdth || c.getY_f()<0 || c.getY_f()>=hght){tmpPict[x][y] = 0;} // if we are outside the boundaries of the starting picture, we put a black pixel
+        else{
+          if(abs(c.getX_f()-c.getX()) < EPSILON && abs(c.getY_f()-c.getY()) < EPSILON){ // if we get rounded coordinates
+            tmpPict[x][y] = image(c.getX(),c.getY(),0,0);
+          }
+          else{
+            //find 4 close enough neighboors of the pixel in the starting picture.
+            // 1. coordiates :
+            Coord cp1 = Coord(floor(c.getX_f()), floor(c.getY_f()));
+            Coord cp2= Coord(floor(c.getX_f()), ceil(c.getY_f()));
+            Coord cp3 = Coord(ceil(c.getX_f()), floor(c.getY_f()));
+            Coord cp4 = Coord(ceil(c.getX_f()), ceil(c.getY_f()));
+            // 2. pixels intensity values :
+            unsigned int p1 = image(cp1.getX(),cp1.getY(),0,0);
+            unsigned int p2 = image(cp2.getX(),cp2.getY(),0,0);
+            unsigned int p3 = image(cp3.getX(),cp3.getY(),0,0);
+            unsigned int p4 = image(cp4.getX(),cp4.getY(),0,0);
+
+            //compute the bilinear interpolation of this pixel intensity value using the four neighboors intensity value and distance :
+            unsigned int newIntensity = bilinear_interpolation2(c, cp1, cp4, p1, p2, p3, p4);
+            if(d<=dist_max){
+              newIntensity = (float)newIntensity - 120.0*pow((1-(d/dist_max)), m) < 0 ? 0 : newIntensity - 120*pow((1-(d/dist_max)), m);
+            }
+            tmpPict[x][y] = newIntensity;
+          }
+        }
+      }
+    }
+
+
+    for (unsigned int i = 0; i < wdth; i++){
+      for (unsigned int j = 0; j < hght; j++){
+        image(i,j,0,0) = tmpPict[i][j];//we copy the values of the matrix into the initial image
+      }
+    }
+
+    for (unsigned int i = 0; i < wdth; i++){ //we delete the temporary matrix
+      delete[] tmpPict[i];
+    }
+    delete[] tmpPict;
+
+    image.save("../project/output_images/output_local_rotation.png"); //saves the new image
+}
+
+//numeric error
+float BWImage::error(BWImage img){
+  assert(img.height() == hght && img.width() == wdth);
+  float mean = 0;
+  for (unsigned int i = 0; i < wdth; i++){
+    for (unsigned int j = 0; j < hght; j++){
+      mean += pow(image(i,j,0,0)-img.image(i,j,0,0), 2);
+      img.image(i,j,0,0) = abs(image(i,j,0,0)-img.image(i,j,0,0));
+    }
+  }
+  // mean /= (wdth*hght);
+  // img.display();
+  return mean;
+}
+
 
 //displays the image
 void BWImage::display(){
@@ -461,14 +584,7 @@ void BWImage::display_f(){
 }
 
 
-float dist(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
-  int x = (x1 - x2); //calculating number to square in next step
-  int y = (y1 - y2);
-  float dist;
-  dist = pow(x, 2) + pow(y, 2);    //calculating distance
-  dist = sqrt(dist);
-	return dist;
-}
+
 
 
 void BWImage::isotropic1(unsigned int x, unsigned int y){
@@ -534,15 +650,7 @@ void BWImage::isotropicGauss(unsigned int x, unsigned int y, float alpha){
   (*this).display();
 }
 
-float dist_an(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, float a, float b) {
-	int x = (x1 - x2); //calculating number to square in next step
-	int y = (y1 - y2);
-	float dist;
-	dist = pow(x, 2)/a + pow(y, 2)/b;    //calculating elliptic distance depending on a and b
-	dist = sqrt(dist);
 
-	return dist;
-}
 
 void BWImage::anisotropic(unsigned int x, unsigned int y, float a, float b){
   vector<vector<float> > values(wdth, vector<float>(hght));

@@ -5,7 +5,8 @@
 #ifndef COORD_H
 #define COORD_H
 
-#define PI 3.14159265358979323846
+#define PI 3.14159265358979323846264338327950
+#define EPSILON 0.0001
 
 using namespace std;
 

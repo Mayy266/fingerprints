@@ -5,8 +5,10 @@
 #include <cmath>
 //#include <Eigen/Dense>
 #include <vector>
+#include <cassert>
 #include "CImg.h"
 #include "coord.h"
+
 
 
 #ifndef IMAGE_H
@@ -36,16 +38,18 @@ class BWImage {
     void symmetry_diagonal();
     void translation(int a, int b);
     void rotation(float theta, unsigned int x0, unsigned int y0); // simple rotation
-    void rotation2(float theta, unsigned int x0, unsigned int y0); // rotation + filling of the lost information
-    void rotation3(float theta, unsigned int x0, unsigned int y0); // optimized rotation to minimize the lost of information
+    void rotation2(float theta, unsigned int x0, unsigned int y0); // rotation, then the filling of the lost information
+    void rotation3(float theta, unsigned int x0, unsigned int y0); // rotation using inverse mapping
     void inverse_rotation(float theta, unsigned int x0, unsigned int y0);
-    unsigned int bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4, unsigned int intensity1,
-      unsigned int intensity2, unsigned int intensity3, unsigned int intensity4);
+    unsigned int bilinear_interpolation(Coord p1, Coord p2, Coord p3, Coord p4, unsigned int value1, unsigned int value2, unsigned int value3, unsigned int value4);
+    unsigned int bilinear_interpolation2(Coord c, Coord p1, Coord p2, unsigned int value1, unsigned int value2, unsigned int value3, unsigned int value4);
+    void local_rotation(float theta, unsigned int x0, unsigned int y0, float dist_max, float m);//local "pressure and rotation"
     void display();
     void display_i();
     void display_f();
     unsigned int height();
     unsigned int width();
+    float error(BWImage img);
     void isotropic1(unsigned int x, unsigned int y);
     void isotropic2(unsigned int x, unsigned int y);
     void isotropic3(unsigned int x, unsigned int y);
