@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/fingerprints.dir/src/starter1.cpp.o CMakeFiles/fingerprints.dir/src/coord.cpp.o  -o fingerprints -rdynamic -lSM -lICE -lX11 -lXext -lSM -lICE -lX11 -lXext -lpthread 

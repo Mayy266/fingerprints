@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/h/hernamay/Bureau/fingerprints/project/include/coord.h
+cstdlib
+-
+iostream
+-
+math.h
+-
+
+/home/h/hernamay/Bureau/fingerprints/project/include/starter1.h
+cstdlib
+-
+iostream
+-
+string
+-
+math.h
+-
+vector
+-
+CImg.h
+/home/h/hernamay/Bureau/fingerprints/project/include/CImg.h
+coord.h
+/home/h/hernamay/Bureau/fingerprints/project/include/coord.h
+
+/home/h/hernamay/Bureau/fingerprints/project/src/coord.cpp
+coord.h
+/home/h/hernamay/Bureau/fingerprints/project/src/coord.h
+
+/home/h/hernamay/Bureau/fingerprints/project/src/starter1.cpp
+starter1.h
+/home/h/hernamay/Bureau/fingerprints/project/src/starter1.h
+
