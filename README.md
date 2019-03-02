@@ -10,9 +10,13 @@ This program allow to apply several mathematical filters, models and algorithms 
 Build
 -----
 You will need a C++14 compatible compiler.
+
 From the Build directory :
+
 command : cmake ../project (only the first time you compile it on your computer)
+
 command : make
+
 Command : oxygen ../project/Doxyfile (to compile the documentation)
 
 ===========================
@@ -20,6 +24,7 @@ Command : oxygen ../project/Doxyfile (to compile the documentation)
 Program usage
 -------------
 From the Build directory :
+
 command : ./test/test_name ../project/images/image_name.png
 
 Example : ./test/test5 ../project/images/clean_finger.png
